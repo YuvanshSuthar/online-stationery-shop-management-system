@@ -1,86 +1,86 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const Login = () => {
-    const [formData, setFormData] = useState({
-        email: "",
-        password: "",
-    });
+  const navigate = useNavigate();
 
-    const [message, setMessage] = useState("");
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
 
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
+  const [message, setMessage] = useState("");
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
-        try {
-            const res = await axios.post(
-                `${import.meta.env.VITE_API_URL}/api/auth/login`,
-                formData
-            );
-            localStorage.setItem("token", res.data.token);
-            localStorage.setItem("user", JSON.stringify(res.data.user));
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-            setMessage("Login successfully");
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/auth/login`,
+        formData
+      );
 
-            setTimeout(() => {
-                window.location.href = "/products";
-            }, 1000);
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
 
-            setFormData({ email: "", password: "" });
-        } catch (error) {
-            console.log("Login error:", error.response?.data || error.message);
-            setMessage(error.response?.data?.message || "Login failed");
-        }
-    };
+      setMessage("Login successful");
 
-    return (
-        <div style={{ padding: "20px", textAlign: "center" }}>
-            <h1>Login Page</h1>
+      setTimeout(() => {
+        navigate("/products");
+      }, 1000);
+    } catch (error) {
+      console.log("Login error:", error.response?.data || error.message);
+      setMessage(error.response?.data?.message || "Login failed");
+    }
+  };
 
-            <form
-                onSubmit={handleSubmit}
-                style={{ maxWidth: "300px", margin: "20px auto" }}
-            >
-                <input
-                    type="email"
-                    name="email"
-                    placeholder="Enter email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    style={{
-                        display: "block",
-                        marginBottom: "10px",
-                        width: "100%",
-                        padding: "8px",
-                    }}
-                />
+  return (
+    <div style={{ padding: "20px", textAlign: "center" }}>
+      <h1>Login Page</h1>
 
-                <input
-                    type="password"
-                    name="password"
-                    placeholder="Enter password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    style={{
-                        display: "block",
-                        marginBottom: "10px",
-                        width: "100%",
-                        padding: "8px",
-                    }}
-                />
+      <form
+        onSubmit={handleSubmit}
+        style={{ maxWidth: "300px", margin: "20px auto" }}
+      >
+        <input
+          type="email"
+          name="email"
+          placeholder="Enter email"
+          value={formData.email}
+          onChange={handleChange}
+          style={{
+            display: "block",
+            width: "100%",
+            marginBottom: "10px",
+            padding: "8px",
+          }}
+        />
 
-                <button type="submit">Login</button>
-            </form>
+        <input
+          type="password"
+          name="password"
+          placeholder="Enter password"
+          value={formData.password}
+          onChange={handleChange}
+          style={{
+            display: "block",
+            width: "100%",
+            marginBottom: "10px",
+            padding: "8px",
+          }}
+        />
 
-            {message && (
-                <p style={{ marginTop: "10px", fontWeight: "bold" }}>{message}</p>
-            )}
-        </div>
-    );
+        <button type="submit">Login</button>
+      </form>
+
+      {message && <p>{message}</p>}
+    </div>
+  );
 };
 
 export default Login;
