@@ -11,7 +11,6 @@ export const registerUser = async (req, res) => {
     }
 
     const existingUser = await User.findOne({ email });
-
     if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
     }
@@ -22,9 +21,10 @@ export const registerUser = async (req, res) => {
       name,
       email,
       password: hashedPassword,
+      role: "customer",
     });
 
-    res.status(201).json({
+    return res.status(201).json({
       message: "User registered successfully",
       user: {
         _id: user._id,
@@ -34,10 +34,8 @@ export const registerUser = async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({
-      message: "Register error",
-      error: error.message,
-    });
+    console.log("REGISTER ERROR:", error);
+    return res.status(500).json({ message: "Register error" });
   }
 };
 
@@ -52,13 +50,13 @@ export const loginUser = async (req, res) => {
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(400).json({ message: "Invalid email" });
+      return res.status(400).json({ message: "User not found" });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid password" });
+      return res.status(400).json({ message: "Invalid credentials" });
     }
 
     const token = jwt.sign(
@@ -67,7 +65,7 @@ export const loginUser = async (req, res) => {
       { expiresIn: "7d" }
     );
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Login successful",
       token,
       user: {
@@ -78,9 +76,7 @@ export const loginUser = async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({
-      message: "Login error",
-      error: error.message,
-    });
+    console.log("LOGIN ERROR:", error);
+    return res.status(500).json({ message: "Login error" });
   }
 };
