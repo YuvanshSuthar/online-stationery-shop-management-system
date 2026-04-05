@@ -1,61 +1,92 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import axios from "axios";
 
-const Navbar = () => {
-  const token = localStorage.getItem("token");
-  const user = JSON.parse(localStorage.getItem("user"));
+const Register = () => {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    localStorage.removeItem("cart");
-    alert("Logged out successfully");
-    window.location.href = "/login";
+  const [message, setMessage] = useState("");
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const linkStyle = {
-    color: "white",
-    textDecoration: "none",
-    fontSize: "18px",
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/auth/register`,
+        formData
+      );
+
+      setMessage(res.data.message || "Register successful");
+      setFormData({ name: "", email: "", password: "" });
+    } catch (error) {
+      console.log("Register error:", error.response?.data || error.message);
+      setMessage(error.response?.data?.message || "Register failed");
+    }
   };
 
   return (
-    <div
-      style={{
-        padding: "15px 25px",
-        background: "#222",
-        display: "flex",
-        alignItems: "center",
-        gap: "20px",
-        flexWrap: "wrap",
-      }}
-    >
-      <Link to="/" style={linkStyle}>Home</Link>
-      <Link to="/products" style={linkStyle}>Products</Link>
+    <div style={{ padding: "20px", textAlign: "center" }}>
+      <h1>Register Page</h1>
 
-      {token && <Link to="/cart" style={linkStyle}>Cart</Link>}
-      {token && <Link to="/my-orders" style={linkStyle}>My Orders</Link>}
-
-      {user?.role === "admin" && <Link to="/admin" style={linkStyle}>Admin</Link>}
-      {user?.role === "admin" && <Link to="/admin-orders" style={linkStyle}>Admin Orders</Link>}
-
-      {!token && <Link to="/login" style={linkStyle}>Login</Link>}
-      {!token && <Link to="/register" style={linkStyle}>Register</Link>}
-
-      {token && (
-        <button
-          onClick={handleLogout}
+      <form
+        onSubmit={handleSubmit}
+        style={{ maxWidth: "320px", margin: "20px auto" }}
+      >
+        <input
+          type="text"
+          name="name"
+          placeholder="Enter name"
+          value={formData.name}
+          onChange={handleChange}
           style={{
-            padding: "8px 14px",
-            cursor: "pointer",
-            borderRadius: "6px",
-            border: "none",
+            display: "block",
+            width: "100%",
+            marginBottom: "10px",
+            padding: "8px",
           }}
-        >
-          Logout
-        </button>
-      )}
+        />
+
+        <input
+          type="email"
+          name="email"
+          placeholder="Enter email"
+          value={formData.email}
+          onChange={handleChange}
+          style={{
+            display: "block",
+            width: "100%",
+            marginBottom: "10px",
+            padding: "8px",
+          }}
+        />
+
+        <input
+          type="password"
+          name="password"
+          placeholder="Enter password"
+          value={formData.password}
+          onChange={handleChange}
+          style={{
+            display: "block",
+            width: "100%",
+            marginBottom: "10px",
+            padding: "8px",
+          }}
+        />
+
+        <button type="submit">Register</button>
+      </form>
+
+      {message && <p>{message}</p>}
     </div>
   );
 };
 
-export default Navbar;
+export default Register;
