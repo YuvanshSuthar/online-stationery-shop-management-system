@@ -7,7 +7,7 @@ import Products from "./pages/Products";
 import Cart from "./pages/Cart";
 import MyOrders from "./pages/MyOrders";
 import AdminDashboard from "./pages/AdminDashboard";
-import AdminOrders from "./pages/AdminOrders";
+import AdminDashboard from "./pages/AdminDashboard";
 
 function App() {
   return (
