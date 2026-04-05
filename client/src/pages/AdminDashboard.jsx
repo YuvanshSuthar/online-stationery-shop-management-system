@@ -1,31 +1,31 @@
 import { useState } from "react";
 import axios from "axios";
 
-const AdminDashboard = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    price: "",
-    description: "",
-    stock: "",
-    image: "",
-    category: "",
-  });
-
+const Admin = () => {
+  const [name, setName] = useState("");
+  const [price, setPrice] = useState("");
+  const [description, setDescription] = useState("");
+  const [countInStock, setCountInStock] = useState("");
+  const [image, setImage] = useState("");
+  const [category, setCategory] = useState("");
   const [message, setMessage] = useState("");
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    try {
-      const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token");
 
+    try {
       const res = await axios.post(
-        "http://localhost:5000/api/products",
-        formData,
+        `${import.meta.env.VITE_API_URL}/api/products`,
+        {
+          name,
+          price,
+          description,
+          countInStock,
+          image,
+          category,
+        },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -33,116 +33,94 @@ const AdminDashboard = () => {
         }
       );
 
-      setMessage(res.data.message);
+      setMessage("Product added successfully ✅");
 
-      setFormData({
-        name: "",
-        price: "",
-        description: "",
-        stock: "",
-        image: "",
-        category: "",
-      });
+      // clear form
+      setName("");
+      setPrice("");
+      setDescription("");
+      setCountInStock("");
+      setImage("");
+      setCategory("");
+
     } catch (error) {
-      setMessage(error.response?.data?.message || "Product add failed");
+      console.log("ERROR:", error.response?.data || error.message);
+      setMessage("Product add failed ❌");
     }
   };
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div style={{ textAlign: "center", padding: "20px" }}>
       <h1>Admin Dashboard</h1>
       <h2>Add Product</h2>
 
-      <form onSubmit={handleSubmit} style={{ maxWidth: "400px" }}>
+      <form onSubmit={handleSubmit} style={{ maxWidth: "400px", margin: "auto" }}>
+        
         <input
           type="text"
-          name="name"
-          placeholder="Product name"
-          value={formData.name}
-          onChange={handleChange}
-          style={{
-            display: "block",
-            width: "100%",
-            marginBottom: "10px",
-            padding: "8px",
-          }}
+          placeholder="Product Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
         />
+
+        <br /><br />
 
         <input
           type="number"
-          name="price"
           placeholder="Price"
-          value={formData.price}
-          onChange={handleChange}
-          style={{
-            display: "block",
-            width: "100%",
-            marginBottom: "10px",
-            padding: "8px",
-          }}
+          value={price}
+          onChange={(e) => setPrice(e.target.value)}
+          required
         />
+
+        <br /><br />
 
         <textarea
-          name="description"
           placeholder="Description"
-          value={formData.description}
-          onChange={handleChange}
-          style={{
-            display: "block",
-            width: "100%",
-            marginBottom: "10px",
-            padding: "8px",
-          }}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          required
         />
+
+        <br /><br />
 
         <input
           type="number"
-          name="stock"
           placeholder="Stock"
-          value={formData.stock}
-          onChange={handleChange}
-          style={{
-            display: "block",
-            width: "100%",
-            marginBottom: "10px",
-            padding: "8px",
-          }}
+          value={countInStock}
+          onChange={(e) => setCountInStock(e.target.value)}
+          required
         />
+
+        <br /><br />
 
         <input
           type="text"
-          name="image"
           placeholder="Image URL"
-          value={formData.image}
-          onChange={handleChange}
-          style={{
-            display: "block",
-            width: "100%",
-            marginBottom: "10px",
-            padding: "8px",
-          }}
+          value={image}
+          onChange={(e) => setImage(e.target.value)}
+          required
         />
+
+        <br /><br />
 
         <input
           type="text"
-          name="category"
           placeholder="Category"
-          value={formData.category}
-          onChange={handleChange}
-          style={{
-            display: "block",
-            width: "100%",
-            marginBottom: "10px",
-            padding: "8px",
-          }}
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          required
         />
+
+        <br /><br />
 
         <button type="submit">Add Product</button>
       </form>
 
-      {message && <p>{message}</p>}
+      <p>{message}</p>
     </div>
   );
 };
 
-export default AdminDashboard;
+export default Admin;
