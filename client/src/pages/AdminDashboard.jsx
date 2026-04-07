@@ -2,6 +2,9 @@ import { useState } from "react";
 import axios from "axios";
 import { getApiUrl } from "../config/api";
 
+const DEFAULT_PRODUCT_IMAGE =
+  "https://dummyimage.com/600x400/1f2937/ffffff&text=No+Image";
+
 const AdminDashboard = () => {
   const user = JSON.parse(localStorage.getItem("user") || "null");
   const isAdmin = user?.role === "admin";
@@ -144,6 +147,25 @@ const AdminDashboard = () => {
           value={formData.image}
           onChange={handleChange}
           required
+        />
+        <br />
+        <br />
+
+        <img
+          src={formData.image || DEFAULT_PRODUCT_IMAGE}
+          alt="Product preview"
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = DEFAULT_PRODUCT_IMAGE;
+          }}
+          style={{
+            width: "100%",
+            maxWidth: "300px",
+            height: "180px",
+            objectFit: "cover",
+            borderRadius: "8px",
+            border: "1px solid #444",
+          }}
         />
         <br />
         <br />

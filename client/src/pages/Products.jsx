@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { getApiUrl } from "../config/api";
 
+const DEFAULT_PRODUCT_IMAGE =
+  "https://dummyimage.com/600x400/1f2937/ffffff&text=No+Image";
+
 const Products = () => {
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -122,6 +125,21 @@ const Products = () => {
                 boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
               }}
             >
+              <img
+                src={item.image || DEFAULT_PRODUCT_IMAGE}
+                alt={item.name}
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = DEFAULT_PRODUCT_IMAGE;
+                }}
+                style={{
+                  width: "100%",
+                  height: "180px",
+                  objectFit: "cover",
+                  borderRadius: "8px",
+                  marginBottom: "10px",
+                }}
+              />
               <h3>{item.name}</h3>
               <p>💰 ₹{item.price}</p>
               <p>{item.description}</p>
