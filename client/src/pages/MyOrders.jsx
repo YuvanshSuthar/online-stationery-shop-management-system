@@ -25,6 +25,26 @@ const MyOrders = () => {
     fetchOrders();
   }, []);
 
+  const removeMyOrder = async (orderId) => {
+    const ok = window.confirm("Remove this order?");
+    if (!ok) return;
+
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await axios.delete(getApiUrl(`/api/orders/my-orders/${orderId}`), {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      alert(res.data.message || "Order removed");
+      fetchOrders();
+    } catch (error) {
+      alert(error.response?.data?.message || "Remove order failed");
+    }
+  };
+
   return (
     <div style={{ padding: "20px" }}>
       <h1>My Orders</h1>
@@ -45,6 +65,21 @@ const MyOrders = () => {
             <p><strong>Order ID:</strong> {order._id}</p>
             <p><strong>Total:</strong> ₹{order.totalAmount}</p>
             <p><strong>Status:</strong> {order.status}</p>
+            <button
+              onClick={() => removeMyOrder(order._id)}
+              style={{
+                padding: "8px 12px",
+                border: "none",
+                borderRadius: "6px",
+                background: "#ef4444",
+                color: "white",
+                cursor: "pointer",
+                fontWeight: "bold",
+                marginBottom: "10px",
+              }}
+            >
+              Remove Order
+            </button>
 
             <h4>Items:</h4>
             {order.items.map((item, index) => (

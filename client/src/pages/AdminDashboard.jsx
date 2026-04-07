@@ -27,6 +27,23 @@ const AdminDashboard = () => {
     });
   };
 
+  const handleImageUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setMessage("Please choose a valid image file.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setFormData((prev) => ({ ...prev, image: reader.result }));
+      setMessage("Image uploaded successfully. You can now add product.");
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -146,8 +163,19 @@ const AdminDashboard = () => {
           placeholder="Image URL"
           value={formData.image}
           onChange={handleChange}
-          required
         />
+        <br />
+        <br />
+
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleImageUpload}
+        />
+        <br />
+        <small style={{ color: "#bbb" }}>
+          Paste image URL or upload image file.
+        </small>
         <br />
         <br />
 

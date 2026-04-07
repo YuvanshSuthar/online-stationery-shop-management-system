@@ -84,3 +84,42 @@ export const updateOrderStatus = async (req, res) => {
     });
   }
 };
+
+// ✅ Delete My Order (User)
+export const deleteMyOrder = async (req, res) => {
+  try {
+    const order = await Order.findOneAndDelete({
+      _id: req.params.id,
+      user: req.user.id,
+    });
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    res.status(200).json({ message: "Order removed successfully" });
+  } catch (error) {
+    res.status(500).json({
+      message: "Delete my order error",
+      error: error.message,
+    });
+  }
+};
+
+// ✅ Delete Order (Admin)
+export const deleteOrder = async (req, res) => {
+  try {
+    const order = await Order.findByIdAndDelete(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    res.status(200).json({ message: "Order removed successfully" });
+  } catch (error) {
+    res.status(500).json({
+      message: "Delete order error",
+      error: error.message,
+    });
+  }
+};

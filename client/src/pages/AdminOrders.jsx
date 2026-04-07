@@ -42,6 +42,26 @@ const AdminOrders = () => {
     }
   };
 
+  const removeOrder = async (orderId) => {
+    const ok = window.confirm("Remove this order?");
+    if (!ok) return;
+
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await axios.delete(getApiUrl(`/api/orders/${orderId}`), {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      alert(res.data.message || "Order removed");
+      fetchAllOrders();
+    } catch (error) {
+      alert(error.response?.data?.message || "Remove order failed");
+    }
+  };
+
   useEffect(() => {
     fetchAllOrders();
   }, []);
@@ -81,6 +101,22 @@ const AdminOrders = () => {
               <option value="Shipped">Shipped</option>
               <option value="Delivered">Delivered</option>
             </select>
+
+            <button
+              onClick={() => removeOrder(order._id)}
+              style={{
+                marginLeft: "10px",
+                padding: "8px 12px",
+                border: "none",
+                borderRadius: "6px",
+                background: "#ef4444",
+                color: "white",
+                cursor: "pointer",
+                fontWeight: "bold",
+              }}
+            >
+              Remove Order
+            </button>
 
             <h4>Items:</h4>
             {order.items.map((item, index) => (
