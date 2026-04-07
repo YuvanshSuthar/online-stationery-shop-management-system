@@ -16,8 +16,18 @@ const createTransporter = () => {
     throw new Error("SMTP_USER or SMTP_PASS missing");
   }
 
+  const smtpHost = process.env.SMTP_HOST || "smtp.gmail.com";
+  const smtpPort = Number(process.env.SMTP_PORT || 587);
+  const smtpSecure = String(process.env.SMTP_SECURE || "false") === "true";
+
   return nodemailer.createTransport({
-    service: "gmail",
+    host: smtpHost,
+    port: smtpPort,
+    secure: smtpSecure,
+    requireTLS: !smtpSecure,
+    connectionTimeout: 20000,
+    greetingTimeout: 20000,
+    socketTimeout: 30000,
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS,
