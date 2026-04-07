@@ -20,14 +20,6 @@ const userSchema = new mongoose.Schema(
       enum: ["customer", "admin"],
       default: "customer",
     },
-    otpHash: {
-      type: String,
-      default: null,
-    },
-    otpExpiresAt: {
-      type: Date,
-      default: null,
-    },
   },
   { timestamps: true }
 );
