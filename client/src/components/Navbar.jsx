@@ -1,9 +1,18 @@
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 
 const Navbar = () => {
-  const token = localStorage.getItem("token");
-  const user = JSON.parse(localStorage.getItem("user") || "null");
-  const isAdmin = user?.role === "admin";
+  const location = useLocation();
+  const [auth, setAuth] = useState({ token: null, user: null });
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const user = JSON.parse(localStorage.getItem("user") || "null");
+    setAuth({ token, user });
+  }, [location.pathname]);
+
+  const token = auth.token;
+  const isAdmin = auth.user?.role === "admin";
 
   const linkStyle = {
     color: "white",
