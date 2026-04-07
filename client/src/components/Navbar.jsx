@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
 
-
-const token = localStorage.getItem("token");
-const user = JSON.parse(localStorage.getItem("user"));
 const Navbar = () => {
+  const token = localStorage.getItem("token");
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+  const isAdmin = user?.role === "admin";
+
   const linkStyle = {
     color: "white",
     marginRight: "20px",
@@ -29,32 +30,35 @@ const Navbar = () => {
         justifyContent: "space-between",
       }}
     >
-      {/* Left side links */}
       <div>
         <Link to="/" style={linkStyle}>Home</Link>
         <Link to="/products" style={linkStyle}>Products</Link>
         <Link to="/cart" style={linkStyle}>Cart</Link>
-        <Link to="/login" style={linkStyle}>Login</Link>
-        <Link to="/register" style={linkStyle}>Register</Link>
-        <Link to="/admin" style={linkStyle}>Admin</Link>
-        <Link to="/my-orders" style={linkStyle}>My Orders</Link>
-        <Link to="/admin-orders" style={linkStyle}>Admin Orders</Link>
+
+        {!token && <Link to="/login" style={linkStyle}>Login</Link>}
+        {!token && <Link to="/register" style={linkStyle}>Register</Link>}
+
+        {token && <Link to="/my-orders" style={linkStyle}>My Orders</Link>}
+
+        {isAdmin && <Link to="/admin" style={linkStyle}>Admin</Link>}
+        {isAdmin && <Link to="/admin-orders" style={linkStyle}>Admin Orders</Link>}
       </div>
 
-      {/* 🔥 Logout Button Right Side */}
-      <button
-        onClick={handleLogout}
-        style={{
-          padding: "8px 14px",
-          cursor: "pointer",
-          borderRadius: "6px",
-          border: "none",
-          backgroundColor: "#ff4d4d",
-          color: "#fff",
-        }}
-      >
-        Logout
-      </button>
+      {token && (
+        <button
+          onClick={handleLogout}
+          style={{
+            padding: "8px 14px",
+            cursor: "pointer",
+            borderRadius: "6px",
+            border: "none",
+            backgroundColor: "#ff4d4d",
+            color: "#fff",
+          }}
+        >
+          Logout
+        </button>
+      )}
     </div>
   );
 };

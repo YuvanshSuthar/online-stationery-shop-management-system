@@ -1,7 +1,11 @@
 import { useState } from "react";
 import axios from "axios";
+import { getApiUrl } from "../config/api";
 
 const AdminDashboard = () => {
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+  const isAdmin = user?.role === "admin";
+
   const [formData, setFormData] = useState({
     name: "",
     price: "",
@@ -14,17 +18,30 @@ const AdminDashboard = () => {
   const [message, setMessage] = useState("");
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!isAdmin) {
+      setMessage("Admin access only. Please login with an admin account.");
+      return;
+    }
+
     const token = localStorage.getItem("token");
+
+    if (!token) {
+      setMessage("Token not found. Please login again.");
+      return;
+    }
 
     try {
       const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/products`,
+        getApiUrl("/api/products"),
         {
           name: formData.name,
           price: Number(formData.price),
@@ -41,7 +58,7 @@ const AdminDashboard = () => {
       );
 
       console.log("SUCCESS:", res.data);
-      setMessage("Product added successfully ✅");
+      setMessage("Product added successfully");
 
       setFormData({
         name: "",
@@ -53,7 +70,15 @@ const AdminDashboard = () => {
       });
     } catch (error) {
       console.log("ERROR:", error.response?.data || error.message);
-      setMessage(error.response?.data?.message || "Product add failed ❌");
+
+      const serverError = error.response?.data?.error;
+      const serverMessage = error.response?.data?.message;
+
+      setMessage(
+        serverError
+          ? `${serverMessage}: ${serverError}`
+          : serverMessage || "Product add failed"
+      );
     }
   };
 
@@ -61,6 +86,12 @@ const AdminDashboard = () => {
     <div style={{ textAlign: "center", padding: "20px" }}>
       <h1>Admin Dashboard</h1>
       <h2>Add Product</h2>
+
+      {!isAdmin && (
+        <p style={{ color: "#ff6b6b" }}>
+          You are logged in as customer. Admin login is required to add products.
+        </p>
+      )}
 
       <form onSubmit={handleSubmit} style={{ maxWidth: "400px", margin: "auto" }}>
         <input
@@ -71,7 +102,8 @@ const AdminDashboard = () => {
           onChange={handleChange}
           required
         />
-        <br /><br />
+        <br />
+        <br />
 
         <input
           type="number"
@@ -81,7 +113,8 @@ const AdminDashboard = () => {
           onChange={handleChange}
           required
         />
-        <br /><br />
+        <br />
+        <br />
 
         <textarea
           name="description"
@@ -90,7 +123,8 @@ const AdminDashboard = () => {
           onChange={handleChange}
           required
         />
-        <br /><br />
+        <br />
+        <br />
 
         <input
           type="number"
@@ -100,7 +134,8 @@ const AdminDashboard = () => {
           onChange={handleChange}
           required
         />
-        <br /><br />
+        <br />
+        <br />
 
         <input
           type="text"
@@ -110,7 +145,8 @@ const AdminDashboard = () => {
           onChange={handleChange}
           required
         />
-        <br /><br />
+        <br />
+        <br />
 
         <input
           type="text"
@@ -120,7 +156,8 @@ const AdminDashboard = () => {
           onChange={handleChange}
           required
         />
-        <br /><br />
+        <br />
+        <br />
 
         <button type="submit">Add Product</button>
       </form>

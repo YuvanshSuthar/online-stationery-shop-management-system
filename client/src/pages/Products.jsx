@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { getApiUrl } from "../config/api";
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -8,7 +9,7 @@ const Products = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/products");
+      const res = await axios.get(getApiUrl("/api/products"));
       console.log("Fetched products:", res.data);
       setProducts(res.data);
     } catch (error) {

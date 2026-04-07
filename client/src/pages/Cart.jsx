@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { getApiUrl } from "../config/api";
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -56,7 +57,7 @@ const Cart = () => {
     }));
 
     const res = await axios.post(
-      "http://localhost:5000/api/orders",
+      getApiUrl("/api/orders"),
       {
         items: orderItems,
         totalAmount,
