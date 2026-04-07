@@ -37,6 +37,48 @@ const createTransporter = () => {
 
 const hashOtp = (otp) => crypto.createHash("sha256").update(otp).digest("hex");
 
+const sendOtpByResend = async ({ to, otp }) => {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) return false;
+
+  const from =
+    process.env.RESEND_FROM ||
+    process.env.SMTP_FROM ||
+    process.env.SMTP_USER;
+
+  if (!from) {
+    throw new Error("RESEND_FROM/SMTP_FROM missing");
+  }
+
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from,
+      to: [to],
+      subject: "Your Stationery Shop OTP",
+      html: `
+        <div style="font-family: Arial, sans-serif; line-height: 1.5">
+          <h2>Login OTP</h2>
+          <p>Your OTP is:</p>
+          <h1 style="letter-spacing: 4px;">${otp}</h1>
+          <p>This OTP is valid for 5 minutes.</p>
+        </div>
+      `,
+    }),
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`Resend error: ${text}`);
+  }
+
+  return true;
+};
+
 export const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -135,21 +177,25 @@ export const requestLoginOtp = async (req, res) => {
     user.otpExpiresAt = new Date(Date.now() + OTP_TTL_MS);
     await user.save();
 
-    const transporter = createTransporter();
+    const sentViaResend = await sendOtpByResend({ to: email, otp });
 
-    await transporter.sendMail({
-      from: process.env.SMTP_FROM || process.env.SMTP_USER,
-      to: email,
-      subject: "Your Stationery Shop OTP",
-      html: `
-        <div style="font-family: Arial, sans-serif; line-height: 1.5">
-          <h2>Login OTP</h2>
-          <p>Your OTP is:</p>
-          <h1 style="letter-spacing: 4px;">${otp}</h1>
-          <p>This OTP is valid for 5 minutes.</p>
-        </div>
-      `,
-    });
+    if (!sentViaResend) {
+      const transporter = createTransporter();
+
+      await transporter.sendMail({
+        from: process.env.SMTP_FROM || process.env.SMTP_USER,
+        to: email,
+        subject: "Your Stationery Shop OTP",
+        html: `
+          <div style="font-family: Arial, sans-serif; line-height: 1.5">
+            <h2>Login OTP</h2>
+            <p>Your OTP is:</p>
+            <h1 style="letter-spacing: 4px;">${otp}</h1>
+            <p>This OTP is valid for 5 minutes.</p>
+          </div>
+        `,
+      });
+    }
 
     return res.status(200).json({ message: "OTP sent to email" });
   } catch (error) {
