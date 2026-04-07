@@ -3,12 +3,7 @@ import axios from "axios";
 import { getApiUrl } from "../config/api";
 
 const Register = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-  });
-
+  const [formData, setFormData] = useState({ name: "", email: "", password: "" });
   const [message, setMessage] = useState("");
 
   const handleChange = (e) => {
@@ -19,74 +14,54 @@ const Register = () => {
     e.preventDefault();
 
     try {
-      const res = await axios.post(
-        getApiUrl("/api/auth/register"),
-        formData
-      );
-
+      const res = await axios.post(getApiUrl("/api/auth/register"), formData);
       setMessage(res.data.message || "Register successful");
       setFormData({ name: "", email: "", password: "" });
     } catch (error) {
-      console.log("Register error:", error.response?.data || error.message);
       setMessage(error.response?.data?.message || "Register failed");
     }
   };
 
   return (
-    <div style={{ padding: "20px", textAlign: "center" }}>
-      <h1>Register Page</h1>
+    <section className="page auth-page">
+      <div className="auth-card glass-card">
+        <h1>Create Account</h1>
+        <p className="muted">Join now and start managing your stationery purchases.</p>
 
-      <form
-        onSubmit={handleSubmit}
-        style={{ maxWidth: "320px", margin: "20px auto" }}
-      >
-        <input
-          type="text"
-          name="name"
-          placeholder="Enter name"
-          value={formData.name}
-          onChange={handleChange}
-          style={{
-            display: "block",
-            width: "100%",
-            marginBottom: "10px",
-            padding: "8px",
-          }}
-        />
+        <form onSubmit={handleSubmit} className="form-stack">
+          <input
+            className="input"
+            type="text"
+            name="name"
+            placeholder="Enter name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+          />
+          <input
+            className="input"
+            type="email"
+            name="email"
+            placeholder="Enter email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
+          <input
+            className="input"
+            type="password"
+            name="password"
+            placeholder="Enter password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
+          <button className="btn btn-primary" type="submit">Register</button>
+        </form>
 
-        <input
-          type="email"
-          name="email"
-          placeholder="Enter email"
-          value={formData.email}
-          onChange={handleChange}
-          style={{
-            display: "block",
-            width: "100%",
-            marginBottom: "10px",
-            padding: "8px",
-          }}
-        />
-
-        <input
-          type="password"
-          name="password"
-          placeholder="Enter password"
-          value={formData.password}
-          onChange={handleChange}
-          style={{
-            display: "block",
-            width: "100%",
-            marginBottom: "10px",
-            padding: "8px",
-          }}
-        />
-
-        <button type="submit">Register</button>
-      </form>
-
-      {message && <p>{message}</p>}
-    </div>
+        {message && <p className="status-text">{message}</p>}
+      </div>
+    </section>
   );
 };
 

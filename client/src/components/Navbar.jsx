@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [auth, setAuth] = useState({ token: null, user: null });
 
   useEffect(() => {
@@ -14,61 +15,65 @@ const Navbar = () => {
   const token = auth.token;
   const isAdmin = auth.user?.role === "admin";
 
-  const linkStyle = {
-    color: "white",
-    marginRight: "20px",
-    textDecoration: "none",
-    fontSize: "18px",
-  };
-
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     localStorage.removeItem("cart");
-    alert("Logged out successfully");
-    window.location.href = "/login";
+    navigate("/login");
   };
 
   return (
-    <div
-      style={{
-        padding: "15px",
-        background: "#222",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-      }}
-    >
-      <div>
-        <Link to="/" style={linkStyle}>Home</Link>
-        <Link to="/products" style={linkStyle}>Products</Link>
-        <Link to="/cart" style={linkStyle}>Cart</Link>
+    <header className="nav-wrap">
+      <nav className="navbar">
+        <div className="nav-brand">Stationery 3D</div>
 
-        {!token && <Link to="/login" style={linkStyle}>Login</Link>}
-        {!token && <Link to="/register" style={linkStyle}>Register</Link>}
+        <div className="nav-links">
+          <NavLink to="/" className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}>
+            Home
+          </NavLink>
+          <NavLink to="/products" className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}>
+            Products
+          </NavLink>
+          <NavLink to="/cart" className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}>
+            Cart
+          </NavLink>
 
-        {token && <Link to="/my-orders" style={linkStyle}>My Orders</Link>}
+          {!token && (
+            <NavLink to="/login" className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}>
+              Login
+            </NavLink>
+          )}
+          {!token && (
+            <NavLink to="/register" className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}>
+              Register
+            </NavLink>
+          )}
 
-        {isAdmin && <Link to="/admin" style={linkStyle}>Admin</Link>}
-        {isAdmin && <Link to="/admin-orders" style={linkStyle}>Admin Orders</Link>}
-      </div>
+          {token && (
+            <NavLink to="/my-orders" className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}>
+              My Orders
+            </NavLink>
+          )}
 
-      {token && (
-        <button
-          onClick={handleLogout}
-          style={{
-            padding: "8px 14px",
-            cursor: "pointer",
-            borderRadius: "6px",
-            border: "none",
-            backgroundColor: "#ff4d4d",
-            color: "#fff",
-          }}
-        >
-          Logout
-        </button>
-      )}
-    </div>
+          {isAdmin && (
+            <NavLink to="/admin" className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}>
+              Admin
+            </NavLink>
+          )}
+          {isAdmin && (
+            <NavLink to="/admin-orders" className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}>
+              Admin Orders
+            </NavLink>
+          )}
+        </div>
+
+        {token && (
+          <button className="btn btn-danger" onClick={handleLogout}>
+            Logout
+          </button>
+        )}
+      </nav>
+    </header>
   );
 };
 

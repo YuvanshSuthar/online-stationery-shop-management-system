@@ -8,13 +8,9 @@ const MyOrders = () => {
   const fetchOrders = async () => {
     try {
       const token = localStorage.getItem("token");
-
       const res = await axios.get(getApiUrl("/api/orders/my-orders"), {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
-
       setOrders(res.data);
     } catch (error) {
       console.log("Fetch orders error", error);
@@ -31,13 +27,9 @@ const MyOrders = () => {
 
     try {
       const token = localStorage.getItem("token");
-
       const res = await axios.delete(getApiUrl(`/api/orders/my-orders/${orderId}`), {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
-
       alert(res.data.message || "Order removed");
       fetchOrders();
     } catch (error) {
@@ -46,51 +38,36 @@ const MyOrders = () => {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>My Orders</h1>
+    <section className="page">
+      <div className="page-head">
+        <h1>My Orders</h1>
+      </div>
 
       {orders.length === 0 ? (
-        <p>No orders found</p>
+        <div className="glass-card empty-state">No orders found</div>
       ) : (
-        orders.map((order) => (
-          <div
-            key={order._id}
-            style={{
-              border: "1px solid #ccc",
-              padding: "10px",
-              marginBottom: "10px",
-              borderRadius: "8px",
-            }}
-          >
-            <p><strong>Order ID:</strong> {order._id}</p>
-            <p><strong>Total:</strong> ₹{order.totalAmount}</p>
-            <p><strong>Status:</strong> {order.status}</p>
-            <button
-              onClick={() => removeMyOrder(order._id)}
-              style={{
-                padding: "8px 12px",
-                border: "none",
-                borderRadius: "6px",
-                background: "#ef4444",
-                color: "white",
-                cursor: "pointer",
-                fontWeight: "bold",
-                marginBottom: "10px",
-              }}
-            >
-              Remove Order
-            </button>
+        <div className="stack-gap">
+          {orders.map((order) => (
+            <article key={order._id} className="glass-card order-card">
+              <p><strong>Order ID:</strong> {order._id}</p>
+              <p><strong>Total:</strong> Rs.{order.totalAmount}</p>
+              <p><strong>Status:</strong> {order.status}</p>
 
-            <h4>Items:</h4>
-            {order.items.map((item, index) => (
-              <div key={index}>
-                <p>{item.name} - ₹{item.price} x {item.quantity}</p>
+              <button className="btn btn-danger" onClick={() => removeMyOrder(order._id)}>
+                Remove Order
+              </button>
+
+              <h4>Items:</h4>
+              <div className="items-list">
+                {order.items.map((item, index) => (
+                  <p key={index}>{item.name} - Rs.{item.price} x {item.quantity}</p>
+                ))}
               </div>
-            ))}
-          </div>
-        ))
+            </article>
+          ))}
+        </div>
       )}
-    </div>
+    </section>
   );
 };
 

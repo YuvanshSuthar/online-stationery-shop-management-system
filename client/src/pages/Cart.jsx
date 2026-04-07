@@ -15,11 +15,8 @@ const Cart = () => {
       if (item._id === id) {
         let newQuantity = item.quantity;
 
-        if (type === "increase") {
-          newQuantity += 1;
-        } else if (type === "decrease" && newQuantity > 1) {
-          newQuantity -= 1;
-        }
+        if (type === "increase") newQuantity += 1;
+        if (type === "decrease" && newQuantity > 1) newQuantity -= 1;
 
         return { ...item, quantity: newQuantity };
       }
@@ -36,95 +33,69 @@ const Cart = () => {
     localStorage.setItem("cart", JSON.stringify(updatedCart));
   };
 
-  const totalAmount = cartItems.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0
-  );
+  const totalAmount = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+
   const placeOrder = async () => {
-  try {
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      alert("Please login first");
-      return;
-    }
-
-    const orderItems = cartItems.map((item) => ({
-      productId: item._id,
-      name: item.name,
-      price: item.price,
-      quantity: item.quantity,
-    }));
-
-    const res = await axios.post(
-      getApiUrl("/api/orders"),
-      {
-        items: orderItems,
-        totalAmount,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Please login first");
+        return;
       }
-    );
 
-    alert(res.data.message);
-    localStorage.removeItem("cart");
-    setCartItems([]);
-  } catch (error) {
-    alert(error.response?.data?.message || "Order failed");
-  }
-};
+      const orderItems = cartItems.map((item) => ({
+        productId: item._id,
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity,
+      }));
+
+      const res = await axios.post(
+        getApiUrl("/api/orders"),
+        { items: orderItems, totalAmount },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      alert(res.data.message);
+      localStorage.removeItem("cart");
+      setCartItems([]);
+    } catch (error) {
+      alert(error.response?.data?.message || "Order failed");
+    }
+  };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Cart Page</h1>
+    <section className="page">
+      <div className="page-head">
+        <h1>Cart</h1>
+      </div>
 
       {cartItems.length === 0 ? (
-        <p>Your cart is empty</p>
+        <div className="glass-card empty-state">Your cart is empty</div>
       ) : (
-        <>
+        <div className="stack-gap">
           {cartItems.map((item) => (
-            <div
-              key={item._id}
-              style={{
-                border: "1px solid #ccc",
-                padding: "10px",
-                marginBottom: "10px",
-                borderRadius: "8px",
-              }}
-            >
+            <article key={item._id} className="glass-card order-card">
               <h3>{item.name}</h3>
-              <p>Price: ₹{item.price}</p>
-              <p>Quantity: {item.quantity}</p>
-              <p>Total: ₹{item.price * item.quantity}</p>
+              <p className="muted">Price: Rs.{item.price}</p>
+              <p className="muted">Quantity: {item.quantity}</p>
+              <p className="muted">Total: Rs.{item.price * item.quantity}</p>
 
-              <button onClick={() => updateQuantity(item._id, "increase")}>
-                +
-              </button>
-
-              <button
-                onClick={() => updateQuantity(item._id, "decrease")}
-                style={{ marginLeft: "10px" }}
-              >
-                -
-              </button>
-
-              <button
-                onClick={() => removeItem(item._id)}
-                style={{ marginLeft: "10px" }}
-              >
-                Remove
-              </button>
-            </div>
+              <div className="row-actions">
+                <button className="btn btn-secondary" onClick={() => updateQuantity(item._id, "increase")}>+</button>
+                <button className="btn btn-secondary" onClick={() => updateQuantity(item._id, "decrease")}>-</button>
+                <button className="btn btn-danger" onClick={() => removeItem(item._id)}>Remove</button>
+              </div>
+            </article>
           ))}
 
-          <h2>Grand Total: ₹{totalAmount}</h2>
-          <button onClick={placeOrder}>Place Order</button>
-        </>
+          <div className="glass-card total-bar">
+            <h2>Grand Total: Rs.{totalAmount}</h2>
+            <button className="btn btn-primary" onClick={placeOrder}>Place Order</button>
+          </div>
+        </div>
       )}
-    </div>
+    </section>
   );
 };
 

@@ -8,13 +8,9 @@ const AdminOrders = () => {
   const fetchAllOrders = async () => {
     try {
       const token = localStorage.getItem("token");
-
       const res = await axios.get(getApiUrl("/api/orders"), {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
-
       setOrders(res.data);
     } catch (error) {
       console.log("Fetch all orders error", error);
@@ -24,17 +20,11 @@ const AdminOrders = () => {
   const updateStatus = async (orderId, status) => {
     try {
       const token = localStorage.getItem("token");
-
       const res = await axios.put(
         getApiUrl(`/api/orders/${orderId}/status`),
         { status },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-
       alert(res.data.message);
       fetchAllOrders();
     } catch (error) {
@@ -48,13 +38,9 @@ const AdminOrders = () => {
 
     try {
       const token = localStorage.getItem("token");
-
       const res = await axios.delete(getApiUrl(`/api/orders/${orderId}`), {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
-
       alert(res.data.message || "Order removed");
       fetchAllOrders();
     } catch (error) {
@@ -67,67 +53,51 @@ const AdminOrders = () => {
   }, []);
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1 style={{ textAlign: "center", marginBottom: "20px" }}>Admin Orders</h1>
+    <section className="page">
+      <div className="page-head">
+        <h1>Admin Orders</h1>
+      </div>
 
       {orders.length === 0 ? (
-        <p>No orders found</p>
+        <div className="glass-card empty-state">No orders found</div>
       ) : (
-        orders.map((order) => (
-          <div
-            key={order._id}
-            style={{
-              border: "1px solid #ccc",
-              padding: "15px",
-              marginBottom: "15px",
-              borderRadius: "10px",
-              background: "#111827",
-              color: "white",
-            }}
-          >
-            <p><strong>Order ID:</strong> {order._id}</p>
-            <p><strong>User:</strong> {order.user?.name}</p>
-            <p><strong>Email:</strong> {order.user?.email}</p>
-            <p><strong>Total:</strong> ₹{order.totalAmount}</p>
-            <p><strong>Status:</strong> {order.status}</p>
+        <div className="stack-gap">
+          {orders.map((order) => (
+            <article key={order._id} className="glass-card order-card">
+              <p><strong>Order ID:</strong> {order._id}</p>
+              <p><strong>User:</strong> {order.user?.name}</p>
+              <p><strong>Email:</strong> {order.user?.email}</p>
+              <p><strong>Total:</strong> Rs.{order.totalAmount}</p>
+              <p><strong>Status:</strong> {order.status}</p>
 
-            <select
-              value={order.status}
-              onChange={(e) => updateStatus(order._id, e.target.value)}
-              style={{ padding: "8px", marginTop: "10px", marginBottom: "10px" }}
-            >
-              <option value="Pending">Pending</option>
-              <option value="Processing">Processing</option>
-              <option value="Shipped">Shipped</option>
-              <option value="Delivered">Delivered</option>
-            </select>
+              <div className="row-actions">
+                <select
+                  className="input status-select"
+                  value={order.status}
+                  onChange={(e) => updateStatus(order._id, e.target.value)}
+                >
+                  <option value="Pending">Pending</option>
+                  <option value="Processing">Processing</option>
+                  <option value="Shipped">Shipped</option>
+                  <option value="Delivered">Delivered</option>
+                </select>
 
-            <button
-              onClick={() => removeOrder(order._id)}
-              style={{
-                marginLeft: "10px",
-                padding: "8px 12px",
-                border: "none",
-                borderRadius: "6px",
-                background: "#ef4444",
-                color: "white",
-                cursor: "pointer",
-                fontWeight: "bold",
-              }}
-            >
-              Remove Order
-            </button>
+                <button className="btn btn-danger" onClick={() => removeOrder(order._id)}>
+                  Remove Order
+                </button>
+              </div>
 
-            <h4>Items:</h4>
-            {order.items.map((item, index) => (
-              <p key={index}>
-                {item.name} - ₹{item.price} x {item.quantity}
-              </p>
-            ))}
-          </div>
-        ))
+              <h4>Items:</h4>
+              <div className="items-list">
+                {order.items.map((item, index) => (
+                  <p key={index}>{item.name} - Rs.{item.price} x {item.quantity}</p>
+                ))}
+              </div>
+            </article>
+          ))}
+        </div>
       )}
-    </div>
+    </section>
   );
 };
 

@@ -133,40 +133,24 @@ const Products = () => {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1 style={{ textAlign: "center", marginBottom: "20px" }}>Products</h1>
+    <section className="page">
+      <div className="page-head">
+        <h1>Products</h1>
+      </div>
 
-      <div
-        style={{
-          display: "flex",
-          gap: "15px",
-          marginBottom: "20px",
-          flexWrap: "wrap",
-          justifyContent: "center",
-        }}
-      >
+      <div className="toolbar glass-card">
         <input
+          className="input"
           type="text"
           placeholder="Search products..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          style={{
-            padding: "10px",
-            width: "250px",
-            borderRadius: "6px",
-            border: "1px solid #ccc",
-          }}
         />
 
         <select
+          className="input"
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
-          style={{
-            padding: "10px",
-            width: "200px",
-            borderRadius: "6px",
-            border: "1px solid #ccc",
-          }}
         >
           {categories.map((cat, index) => (
             <option key={index} value={cat}>
@@ -177,26 +161,11 @@ const Products = () => {
       </div>
 
       {filteredProducts.length === 0 ? (
-        <p style={{ textAlign: "center" }}>No products found</p>
+        <div className="glass-card empty-state">No products found</div>
       ) : (
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
-            gap: "20px",
-          }}
-        >
+        <div className="product-grid">
           {filteredProducts.map((item) => (
-            <div
-              key={item._id}
-              style={{
-                background: "#1f2937",
-                color: "white",
-                padding: "15px",
-                borderRadius: "10px",
-                boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
-              }}
-            >
+            <article key={item._id} className="glass-card product-card">
               <img
                 src={item.image || DEFAULT_PRODUCT_IMAGE}
                 alt={item.name}
@@ -204,145 +173,42 @@ const Products = () => {
                   e.currentTarget.onerror = null;
                   e.currentTarget.src = DEFAULT_PRODUCT_IMAGE;
                 }}
-                style={{
-                  width: "100%",
-                  height: "180px",
-                  objectFit: "cover",
-                  borderRadius: "8px",
-                  marginBottom: "10px",
-                }}
+                className="product-image"
               />
 
               <h3>{item.name}</h3>
-              <p>Price: Rs.{item.price}</p>
-              <p>{item.description}</p>
-              <p>Stock: {item.stock}</p>
-              <p>Category: {item.category}</p>
+              <p className="price">Rs.{item.price}</p>
+              <p className="muted">{item.description}</p>
+              <p className="muted">Stock: {item.stock}</p>
+              <p className="muted">Category: {item.category}</p>
 
               {isAdmin && editingId !== item._id && (
-                <button
-                  onClick={() => startEdit(item)}
-                  style={{
-                    marginTop: "8px",
-                    padding: "8px",
-                    width: "100%",
-                    border: "none",
-                    borderRadius: "6px",
-                    background: "#3b82f6",
-                    color: "white",
-                    cursor: "pointer",
-                    fontWeight: "bold",
-                  }}
-                >
+                <button className="btn btn-secondary" onClick={() => startEdit(item)}>
                   Edit Product
                 </button>
               )}
 
               {isAdmin && editingId === item._id && (
-                <div style={{ marginTop: "10px" }}>
-                  <input
-                    type="text"
-                    name="name"
-                    placeholder="Name"
-                    value={editForm.name}
-                    onChange={handleEditChange}
-                    style={{ width: "100%", marginBottom: "6px", padding: "8px" }}
-                  />
-                  <input
-                    type="number"
-                    name="price"
-                    placeholder="Price"
-                    value={editForm.price}
-                    onChange={handleEditChange}
-                    style={{ width: "100%", marginBottom: "6px", padding: "8px" }}
-                  />
-                  <textarea
-                    name="description"
-                    placeholder="Description"
-                    value={editForm.description}
-                    onChange={handleEditChange}
-                    style={{ width: "100%", marginBottom: "6px", padding: "8px" }}
-                  />
-                  <input
-                    type="number"
-                    name="stock"
-                    placeholder="Stock"
-                    value={editForm.stock}
-                    onChange={handleEditChange}
-                    style={{ width: "100%", marginBottom: "6px", padding: "8px" }}
-                  />
-                  <input
-                    type="text"
-                    name="image"
-                    placeholder="Image URL"
-                    value={editForm.image}
-                    onChange={handleEditChange}
-                    style={{ width: "100%", marginBottom: "6px", padding: "8px" }}
-                  />
-                  <input
-                    type="text"
-                    name="category"
-                    placeholder="Category"
-                    value={editForm.category}
-                    onChange={handleEditChange}
-                    style={{ width: "100%", marginBottom: "6px", padding: "8px" }}
-                  />
-                  <button
-                    onClick={() => saveEdit(item._id)}
-                    style={{
-                      marginTop: "6px",
-                      padding: "8px",
-                      width: "100%",
-                      border: "none",
-                      borderRadius: "6px",
-                      background: "#22c55e",
-                      color: "white",
-                      cursor: "pointer",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    Save
-                  </button>
-                  <button
-                    onClick={cancelEdit}
-                    style={{
-                      marginTop: "6px",
-                      padding: "8px",
-                      width: "100%",
-                      border: "none",
-                      borderRadius: "6px",
-                      background: "#ef4444",
-                      color: "white",
-                      cursor: "pointer",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    Cancel
-                  </button>
+                <div className="editor-box">
+                  <input className="input" type="text" name="name" placeholder="Name" value={editForm.name} onChange={handleEditChange} />
+                  <input className="input" type="number" name="price" placeholder="Price" value={editForm.price} onChange={handleEditChange} />
+                  <textarea className="input" name="description" placeholder="Description" value={editForm.description} onChange={handleEditChange} />
+                  <input className="input" type="number" name="stock" placeholder="Stock" value={editForm.stock} onChange={handleEditChange} />
+                  <input className="input" type="text" name="image" placeholder="Image URL" value={editForm.image} onChange={handleEditChange} />
+                  <input className="input" type="text" name="category" placeholder="Category" value={editForm.category} onChange={handleEditChange} />
+                  <button className="btn btn-primary" onClick={() => saveEdit(item._id)}>Save</button>
+                  <button className="btn btn-danger" onClick={cancelEdit}>Cancel</button>
                 </div>
               )}
 
-              <button
-                onClick={() => addToCart(item)}
-                style={{
-                  marginTop: "10px",
-                  padding: "10px",
-                  width: "100%",
-                  border: "none",
-                  borderRadius: "6px",
-                  background: "#22c55e",
-                  color: "white",
-                  cursor: "pointer",
-                  fontWeight: "bold",
-                }}
-              >
+              <button className="btn btn-primary" onClick={() => addToCart(item)}>
                 Add to Cart
               </button>
-            </div>
+            </article>
           ))}
         </div>
       )}
-    </div>
+    </section>
   );
 };
 

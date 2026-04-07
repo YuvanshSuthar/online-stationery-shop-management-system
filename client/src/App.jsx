@@ -12,17 +12,23 @@ import AdminOrders from "./pages/AdminOrders";
 function App() {
   return (
     <BrowserRouter>
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/products" element={<Products />} />
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/my-orders" element={<MyOrders />} />
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/admin-orders" element={<AdminOrders />} />
-      </Routes>
+      <div className="app-shell">
+        <div className="bg-orb bg-orb-one" />
+        <div className="bg-orb bg-orb-two" />
+        <Navbar />
+        <main className="app-main">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/products" element={<Products />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/my-orders" element={<MyOrders />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin-orders" element={<AdminOrders />} />
+          </Routes>
+        </main>
+      </div>
     </BrowserRouter>
   );
 }

@@ -60,7 +60,7 @@ const AdminDashboard = () => {
     }
 
     try {
-      const res = await axios.post(
+      await axios.post(
         getApiUrl("/api/products"),
         {
           name: formData.name,
@@ -77,7 +77,6 @@ const AdminDashboard = () => {
         }
       );
 
-      console.log("SUCCESS:", res.data);
       setMessage("Product added successfully");
 
       setFormData({
@@ -89,8 +88,6 @@ const AdminDashboard = () => {
         category: "",
       });
     } catch (error) {
-      console.log("ERROR:", error.response?.data || error.message);
-
       const serverError = error.response?.data?.error;
       const serverMessage = error.response?.data?.message;
 
@@ -103,117 +100,41 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div style={{ textAlign: "center", padding: "20px" }}>
-      <h1>Admin Dashboard</h1>
-      <h2>Add Product</h2>
+    <section className="page admin-page">
+      <div className="page-head">
+        <h1>Admin Dashboard</h1>
+      </div>
 
-      {!isAdmin && (
-        <p style={{ color: "#ff6b6b" }}>
-          You are logged in as customer. Admin login is required to add products.
-        </p>
-      )}
+      <div className="glass-card admin-form-card">
+        <h2>Add Product</h2>
 
-      <form onSubmit={handleSubmit} style={{ maxWidth: "400px", margin: "auto" }}>
-        <input
-          type="text"
-          name="name"
-          placeholder="Product Name"
-          value={formData.name}
-          onChange={handleChange}
-          required
-        />
-        <br />
-        <br />
+        {!isAdmin && <p className="status-text error">Admin login is required.</p>}
 
-        <input
-          type="number"
-          name="price"
-          placeholder="Price"
-          value={formData.price}
-          onChange={handleChange}
-          required
-        />
-        <br />
-        <br />
+        <form onSubmit={handleSubmit} className="form-grid">
+          <input className="input" type="text" name="name" placeholder="Product Name" value={formData.name} onChange={handleChange} required />
+          <input className="input" type="number" name="price" placeholder="Price" value={formData.price} onChange={handleChange} required />
+          <textarea className="input" name="description" placeholder="Description" value={formData.description} onChange={handleChange} required />
+          <input className="input" type="number" name="stock" placeholder="Stock" value={formData.stock} onChange={handleChange} required />
+          <input className="input" type="text" name="image" placeholder="Image URL" value={formData.image} onChange={handleChange} />
+          <input className="input file-input" type="file" accept="image/*" onChange={handleImageUpload} />
 
-        <textarea
-          name="description"
-          placeholder="Description"
-          value={formData.description}
-          onChange={handleChange}
-          required
-        />
-        <br />
-        <br />
+          <img
+            src={formData.image || DEFAULT_PRODUCT_IMAGE}
+            alt="Product preview"
+            onError={(e) => {
+              e.currentTarget.onerror = null;
+              e.currentTarget.src = DEFAULT_PRODUCT_IMAGE;
+            }}
+            className="preview-image"
+          />
 
-        <input
-          type="number"
-          name="stock"
-          placeholder="Stock"
-          value={formData.stock}
-          onChange={handleChange}
-          required
-        />
-        <br />
-        <br />
+          <input className="input" type="text" name="category" placeholder="Category" value={formData.category} onChange={handleChange} required />
+          <button className="btn btn-primary" type="submit">Add Product</button>
+        </form>
 
-        <input
-          type="text"
-          name="image"
-          placeholder="Image URL"
-          value={formData.image}
-          onChange={handleChange}
-        />
-        <br />
-        <br />
-
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleImageUpload}
-        />
-        <br />
-        <small style={{ color: "#bbb" }}>
-          Paste image URL or upload image file.
-        </small>
-        <br />
-        <br />
-
-        <img
-          src={formData.image || DEFAULT_PRODUCT_IMAGE}
-          alt="Product preview"
-          onError={(e) => {
-            e.currentTarget.onerror = null;
-            e.currentTarget.src = DEFAULT_PRODUCT_IMAGE;
-          }}
-          style={{
-            width: "100%",
-            maxWidth: "300px",
-            height: "180px",
-            objectFit: "cover",
-            borderRadius: "8px",
-            border: "1px solid #444",
-          }}
-        />
-        <br />
-        <br />
-
-        <input
-          type="text"
-          name="category"
-          placeholder="Category"
-          value={formData.category}
-          onChange={handleChange}
-          required
-        />
-        <br />
-        <br />
-
-        <button type="submit">Add Product</button>
-      </form>
-
-      <p>{message}</p>
-    </div>
+        {message && <p className="status-text">{message}</p>}
+      </div>
+    </section>
   );
 };
 
