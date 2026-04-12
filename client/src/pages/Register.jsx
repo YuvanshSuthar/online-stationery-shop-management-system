@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import { getApiUrl } from "../config/api";
 
@@ -23,10 +24,10 @@ const Register = () => {
   };
 
   return (
-    <section className="page auth-page">
+    <section className="page auth-page auth-entry-page">
       <div className="auth-card glass-card">
         <h1>Create Account</h1>
-        <p className="muted">Join now and start managing your stationery purchases.</p>
+        <p className="muted">Join SHARMA Stationery Hub to start shopping.</p>
 
         <form onSubmit={handleSubmit} className="form-stack">
           <input
@@ -60,6 +61,11 @@ const Register = () => {
         </form>
 
         {message && <p className="status-text">{message}</p>}
+        <p className="switch-link">
+          Already have account?
+          {" "}
+          <Link to="/login">Login</Link>
+        </p>
       </div>
     </section>
   );

@@ -1,4 +1,5 @@
 import User from "../models/User.js";
+import LoginActivity from "../models/LoginActivity.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
@@ -65,6 +66,25 @@ export const loginUser = async (req, res) => {
       { expiresIn: "7d" }
     );
 
+    const forwardedIp = req.headers["x-forwarded-for"];
+    const ipAddress = Array.isArray(forwardedIp)
+      ? forwardedIp[0]
+      : (forwardedIp || req.socket?.remoteAddress || "").toString();
+
+    try {
+      await LoginActivity.create({
+        user: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        ipAddress,
+        userAgent: req.headers["user-agent"] || "",
+        loggedInAt: new Date(),
+      });
+    } catch (activityError) {
+      console.log("LOGIN ACTIVITY ERROR:", activityError.message);
+    }
+
     return res.status(200).json({
       message: "Login successful",
       token,
@@ -78,5 +98,18 @@ export const loginUser = async (req, res) => {
   } catch (error) {
     console.log("LOGIN ERROR:", error);
     return res.status(500).json({ message: "Login error" });
+  }
+};
+
+export const getLoginActivities = async (req, res) => {
+  try {
+    const activities = await LoginActivity.find()
+      .sort({ loggedInAt: -1 })
+      .limit(200);
+
+    return res.status(200).json(activities);
+  } catch (error) {
+    console.log("GET LOGIN ACTIVITIES ERROR:", error);
+    return res.status(500).json({ message: "Could not fetch login activities" });
   }
 };

@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { getApiUrl } from "../config/api";
 
-const Login = () => {
+const Login = ({ onAuthChange, adminOnly = false }) => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -22,13 +22,19 @@ const Login = () => {
     try {
       const res = await axios.post(getApiUrl("/api/auth/login"), formData);
 
+      if (adminOnly && res.data.user?.role !== "admin") {
+        setMessage("Only admin account can login from this page.");
+        return;
+      }
+
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
+      onAuthChange?.();
 
       setMessage("Login successful");
 
       setTimeout(() => {
-        navigate("/products");
+        navigate(adminOnly ? "/admin" : "/home");
       }, 600);
     } catch (error) {
       setMessage(error.response?.data?.message || "Login failed");
@@ -36,10 +42,14 @@ const Login = () => {
   };
 
   return (
-    <section className="page auth-page">
+    <section className="page auth-page auth-entry-page">
       <div className="auth-card glass-card">
-        <h1>Welcome Back</h1>
-        <p className="muted">Login with your email and password.</p>
+        <h1>{adminOnly ? "Admin Login" : "Welcome Back"}</h1>
+        <p className="muted">
+          {adminOnly
+            ? "Login with admin account credentials."
+            : "Login with your email and password."}
+        </p>
 
         <form onSubmit={handleSubmit} className="form-stack">
           <input
@@ -64,6 +74,13 @@ const Login = () => {
         </form>
 
         {message && <p className="status-text">{message}</p>}
+        {!adminOnly && (
+          <p className="switch-link">
+            Admin?
+            {" "}
+            <Link to="/admin-login">Login here</Link>
+          </p>
+        )}
       </div>
     </section>
   );

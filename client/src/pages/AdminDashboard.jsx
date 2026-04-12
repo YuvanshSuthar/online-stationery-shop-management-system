@@ -99,6 +99,30 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleSeedProducts = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setMessage("Token not found. Please login again.");
+        return;
+      }
+
+      const res = await axios.post(
+        getApiUrl("/api/products/seed-demo"),
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      setMessage(
+        `${res.data.message}. Added: ${res.data.insertedCount ?? 0} products.`
+      );
+    } catch (error) {
+      setMessage(error.response?.data?.message || "Demo products add failed");
+    }
+  };
+
   return (
     <section className="page admin-page">
       <div className="page-head">
@@ -107,6 +131,10 @@ const AdminDashboard = () => {
 
       <div className="glass-card admin-form-card">
         <h2>Add Product</h2>
+        <p className="muted">Manage inventory for SHARMA Stationery Hub.</p>
+        <button className="btn btn-dark seed-btn" type="button" onClick={handleSeedProducts}>
+          Add 30+ Demo Products
+        </button>
 
         {!isAdmin && <p className="status-text error">Admin login is required.</p>}
 

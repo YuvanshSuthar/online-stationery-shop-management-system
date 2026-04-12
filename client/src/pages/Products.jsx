@@ -5,9 +5,8 @@ import { getApiUrl } from "../config/api";
 const DEFAULT_PRODUCT_IMAGE =
   "https://dummyimage.com/600x400/1f2937/ffffff&text=No+Image";
 
-const Products = () => {
-  const user = JSON.parse(localStorage.getItem("user") || "null");
-  const isAdmin = user?.role === "admin";
+const Products = ({ auth }) => {
+  const isAdmin = auth?.user?.role === "admin";
 
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -24,7 +23,9 @@ const Products = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await axios.get(getApiUrl("/api/products"));
+      const token = localStorage.getItem("token");
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const res = await axios.get(getApiUrl("/api/products"), { headers });
       setProducts(res.data);
     } catch (error) {
       console.log("Product fetch error", error);
@@ -43,13 +44,16 @@ const Products = () => {
   const filteredProducts = products.filter((item) => {
     const matchesSearch =
       item.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.description?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const adminMatchesCategorySearch = isAdmin
+      ? item.category?.toLowerCase().includes(searchTerm.toLowerCase())
+      : false;
 
     const matchesCategory =
       selectedCategory === "All" || item.category === selectedCategory;
 
-    return matchesSearch && matchesCategory;
+    return (matchesSearch || adminMatchesCategorySearch) && matchesCategory;
   });
 
   const addToCart = (product) => {
@@ -135,10 +139,11 @@ const Products = () => {
   return (
     <section className="page">
       <div className="page-head">
-        <h1>Products</h1>
+        <h1>Stationery Collection</h1>
+        <p className="muted">Bright essentials from SHARMA Stationery Hub.</p>
       </div>
 
-      <div className="toolbar glass-card">
+      <div className={`toolbar glass-card ${!isAdmin ? "toolbar-single" : ""}`}>
         <input
           className="input"
           type="text"
@@ -147,17 +152,19 @@ const Products = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
 
-        <select
-          className="input"
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-        >
-          {categories.map((cat, index) => (
-            <option key={index} value={cat}>
-              {cat}
-            </option>
-          ))}
-        </select>
+        {isAdmin && (
+          <select
+            className="input"
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+          >
+            {categories.map((cat, index) => (
+              <option key={index} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
 
       {filteredProducts.length === 0 ? (
@@ -179,8 +186,8 @@ const Products = () => {
               <h3>{item.name}</h3>
               <p className="price">Rs.{item.price}</p>
               <p className="muted">{item.description}</p>
-              <p className="muted">Stock: {item.stock}</p>
-              <p className="muted">Category: {item.category}</p>
+              {isAdmin && <p className="muted">Stock: {item.stock}</p>}
+              {isAdmin && <p className="muted">Category: {item.category}</p>}
 
               {isAdmin && editingId !== item._id && (
                 <button className="btn btn-secondary" onClick={() => startEdit(item)}>
@@ -201,9 +208,11 @@ const Products = () => {
                 </div>
               )}
 
-              <button className="btn btn-primary" onClick={() => addToCart(item)}>
-                Add to Cart
-              </button>
+              {!isAdmin && (
+                <button className="btn btn-primary" onClick={() => addToCart(item)}>
+                  Add to Cart
+                </button>
+              )}
             </article>
           ))}
         </div>
